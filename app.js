@@ -2,6 +2,8 @@ const express = require("express");
 const drones = require("./drones");
 const app = express();
 
+const PORT = process.env.PORT || 5000;
+
 let lastRequestTime = Date.now();
 
 let idleChecker;
@@ -35,6 +37,6 @@ app.get("/drones", (req, res) => {
   res.send(Object.fromEntries(drones.VIOLATIONS));
 });
 
-app.listen(3001, () => {
-  console.log("Server is running on port 3001");
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}...`);
 });
