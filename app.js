@@ -9,6 +9,8 @@ let lastRequestTime = Date.now();
 let idleChecker;
 
 app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Origin");
   lastRequestTime = Date.now();
   if (!idleChecker) {
     idleChecker = setInterval(() => {
