@@ -4,7 +4,7 @@ const parser = require("xml2js");
 let VIOLATIONS = new Map();
 
 async function handler() {
-  console.log("DRONES CALLED");
+  console.log("DRONES CALLED " + VIOLATIONS);
   cleanViolations();
   const response = await fetch("http://assignments.reaktor.com/birdnest/drones")
     .then((response) => response.text())

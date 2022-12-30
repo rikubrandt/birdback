@@ -31,6 +31,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/drones", (req, res) => {
+  console.log("Drones requested", +Object.fromEntries(drones.VIOLATIONS));
   res.send(Object.fromEntries(drones.VIOLATIONS));
 });
 
