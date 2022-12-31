@@ -3,10 +3,17 @@ const parser = require("xml2js");
 
 let VIOLATIONS = new Map();
 
+// No-fly zone radius and center
+const NDZ_RADIUS = 100000;
+const NDZ_CENTER = [250000, 250000];
+
+const DRONES_URL = "http://assignments.reaktor.com/birdnest/drones";
+const PILOTS_URL = "http://assignments.reaktor.com/birdnest/pilots/";
+
 async function handler() {
-  console.log("DRONES CALLED " + VIOLATIONS);
+  console.log("Updating violations...");
   cleanViolations();
-  const response = await fetch("http://assignments.reaktor.com/birdnest/drones")
+  const response = await fetch(DRONES_URL)
     .then((response) => response.text())
     .then((str) => parser.parseStringPromise(str))
     .then((result) => JSON.stringify(result))
@@ -19,7 +26,7 @@ async function handler() {
     const drones = data[0].drone;
     for (let i = 0; i < drones.length; i++) {
       const drone = drones[i];
-      if (dist_from_nest(drone.positionX, drone.positionY) < 100000) {
+      if (dist_from_nest(drone.positionX, drone.positionY) < NDZ_RADIUS) {
         const pilot = VIOLATIONS.get(drone.serialNumber);
         // If the pilot already exists, update the timestamp and closest coordinates.
         if (pilot) {
@@ -48,7 +55,7 @@ async function handler() {
   }
 }
 
-//Check if violations are 10 minutes old and clean them.
+//Check if violations are over 10 minutes old and clean them.
 function cleanViolations() {
   const now = new Date();
   VIOLATIONS.forEach((pilot, serialNumber) => {
@@ -60,14 +67,16 @@ function cleanViolations() {
   });
 }
 
-function dist_from_nest(x1, y1) {
-  return Math.sqrt(Math.pow(250000 - x1, 2) + Math.pow(250000 - y1, 2));
+function dist_from_nest(x, y) {
+  return Math.sqrt(
+    Math.pow(NDZ_CENTER[0] - x, 2) + Math.pow(NDZ_CENTER[1] - y, 2)
+  );
 }
 
 async function getPilot(serialNumber) {
-  const response = await fetch(
-    "http://assignments.reaktor.com/birdnest/pilots/" + serialNumber
-  ).then((response) => response.json());
+  const response = await fetch(PILOTS_URL + serialNumber).then((response) =>
+    response.json()
+  );
   return response;
 }
 
